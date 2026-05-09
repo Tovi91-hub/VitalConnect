@@ -1,0 +1,94 @@
+
+const VitalConnect = (() => {
+  const STORE = {
+    users: 'vc_users',
+    session: 'vc_session',
+    prayers: 'vc_prayers',
+    blessings: 'vc_blessings',
+    helpRequests: 'vc_help_requests',
+    moods: 'vc_moods'
+  };
+
+  // Seed data embedded inline — no fetch() calls needed.
+  // fetch('data/users.json') fails on GitHub Pages and many static hosts,
+  // leaving localStorage empty and making login silently fail.
+  const seedData = {
+    [STORE.users]: [
+      { id: 1, name: 'Demo User', email: 'demo@vitalconnect.com', password: 'Password123!', role: 'member', city: 'Indianapolis', state: 'IN', bio: 'Community member using VitalConnect for wellness support.' },
+      { id: 2, name: 'Admin User', email: 'admin@vitalconnect.com', password: 'Admin123!', role: 'admin', city: 'Lafayette', state: 'IN', bio: 'Platform administrator.' }
+    ],
+    [STORE.prayers]: [
+      { id: 1, title: 'Prayer for guidance', content: 'Please pray for wisdom and direction as I balance school, work, and family responsibilities.', authorEmail: 'demo@vitalconnect.com', authorName: 'Demo User', createdAt: '2026-03-01T12:00:00' }
+    ],
+    [STORE.blessings]: [
+      { id: 1, title: "Children's books bundle", description: "A clean set of children's books available for pickup.", category: 'Items', location: 'Community Hub', image: '', authorEmail: 'demo@vitalconnect.com', authorName: 'Demo User', createdAt: '2026-03-02T09:00:00' }
+    ],
+    [STORE.helpRequests]: [
+      { id: 1, title: 'Need grocery transportation', description: 'Looking for a ride to the grocery store this Saturday morning.', urgency: 'Medium', authorEmail: 'demo@vitalconnect.com', authorName: 'Demo User', createdAt: '2026-03-03T14:30:00' }
+    ],
+    [STORE.moods]: [
+      { id: 1, mood: 'Hopeful', notes: 'Feeling optimistic about this week.', authorEmail: 'demo@vitalconnect.com', authorName: 'Demo User', createdAt: '2026-03-04T08:00:00' }
+    ]
+  };
+
+  const protectedPages = ['dashboard.html','mood-check.html','mood-history.html','prayer-wall.html','blessing-marketplace.html','help-board.html','my-posts.html','profile.html'];
+  const pathName = () => window.location.pathname.split('/').pop() || 'index.html';
+  const formatDate = value => new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+
+  function ensureSeeds() {
+    for (const key of Object.keys(seedData)) {
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, JSON.stringify(seedData[key]));
+      }
+    }
+  }
+
+  const getCollection = key => JSON.parse(localStorage.getItem(key) || '[]');
+  const setCollection = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const getSession = () => JSON.parse(localStorage.getItem(STORE.session) || 'null');
+  const setSession = user => localStorage.setItem(STORE.session, JSON.stringify({ email: user.email, name: user.name, role: user.role || 'member', loggedInAt: new Date().toISOString() }));
+  const logout = () => { localStorage.removeItem(STORE.session); window.location.href = 'login.html'; };
+
+  function requireAuth() {
+    if (protectedPages.includes(pathName()) && !getSession()) window.location.href = 'login.html';
+  }
+
+  const nextId = items => items.length ? Math.max(...items.map(item => Number(item.id) || 0)) + 1 : 1;
+  const createNotice = (message, type = 'info') => `<div class="notice ${type}">${message}</div>`;
+
+  function renderShell() {
+    const current = pathName();
+    const session = getSession();
+    const appHeader = document.querySelector('#app-header');
+    const appFooter = document.querySelector('#app-footer');
+
+    if (appHeader) {
+      const authButtons = session
+        ? `<a class="btn-ghost" href="dashboard.html">Dashboard</a><button class="btn" id="logoutBtn" type="button">Logout</button>`
+        : `<a class="btn-ghost" href="login.html">Login</a><a class="btn" href="register.html">Get Started</a>`;
+      appHeader.innerHTML = `<a class="skip-link" href="#main-content">Skip to content</a><header class="site-header"><div class="container navbar"><a class="brand" href="index.html" aria-label="VitalConnect home"><img src="assets/logo.svg" alt="VitalConnect logo"></a><nav class="nav-links" aria-label="Primary navigation">${[['index.html','Home'],['about.html','About'],['dashboard.html','Dashboard'],['prayer-wall.html','Prayer Wall'],['blessing-marketplace.html','Marketplace'],['help-board.html','Help Board'],['contact.html','Contact']].map(([href,label]) => `<a href="${href}" class="${current===href?'active':''}">${label}</a>`).join('')}</nav><div class="nav-actions">${authButtons}</div></div></header>`;
+    }
+
+    if (appFooter) {
+      appFooter.innerHTML = `<footer class="site-footer"><div class="container footer-grid"><div><img src="assets/logo.svg" alt="VitalConnect logo" style="width:180px;margin-bottom:12px"><p class="mini">VitalConnect is a capstone-ready community wellness platform designed for static hosting using HTML, CSS, JavaScript, and LocalStorage.</p></div><div><h3>Explore</h3><p class="mini"><a href="dashboard.html">Dashboard</a><br><a href="mood-check.html">Mood Check</a><br><a href="my-posts.html">My Posts</a></p></div><div><h3>Support</h3><p class="mini"><a href="contact.html">Contact</a><br><a href="about.html">About VitalConnect</a><br><a href="policies.html">Policies</a></p></div></div></footer>`;
+    }
+
+    const logoutBtn = document.querySelector('#logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+  }
+
+  const dashboardSidebar = (activeHref = 'dashboard.html') => `<aside class="sidebar"><a href="dashboard.html" class="${activeHref==='dashboard.html'?'active':''}">Overview</a><a href="mood-check.html" class="${activeHref==='mood-check.html'?'active':''}">Mood Check</a><a href="mood-history.html" class="${activeHref==='mood-history.html'?'active':''}">Mood History</a><a href="prayer-wall.html" class="${activeHref==='prayer-wall.html'?'active':''}">Prayer Wall</a><a href="blessing-marketplace.html" class="${activeHref==='blessing-marketplace.html'?'active':''}">Marketplace</a><a href="help-board.html" class="${activeHref==='help-board.html'?'active':''}">Help Board</a><a href="my-posts.html" class="${activeHref==='my-posts.html'?'active':''}">My Posts</a><a href="profile.html" class="${activeHref==='profile.html'?'active':''}">Profile</a></aside>`;
+
+  const sanitize = (text = '') => { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; };
+  const validateEmail = (email = '') => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // pageInit is now synchronous — ensureSeeds() no longer uses fetch()
+  const pageInit = fn => document.addEventListener('DOMContentLoaded', () => {
+    ensureSeeds();
+    requireAuth();
+    renderShell();
+    if (typeof fn === 'function') fn();
+  });
+
+  return { STORE, getCollection, setCollection, getSession, setSession, logout, nextId, createNotice, formatDate, renderShell, dashboardSidebar, sanitize, validateEmail, pageInit };
+})();
