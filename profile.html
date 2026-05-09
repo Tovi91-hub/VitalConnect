@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile | VitalConnect</title>
   <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
-  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="logo.svg" type="svg+xml">
+  <link rel="stylesheet" href="style.css">
   
 </head>
 <body>
   <div id="app-header"></div>
   <main id="main-content"><section class="container dashboard-shell"><aside class="sidebar"><a href="dashboard.html">Overview</a><a href="mood-check.html">Mood Check</a><a href="mood-history.html">Mood History</a><a href="prayer-wall.html">Prayer Wall</a><a href="blessing-marketplace.html">Marketplace</a><a href="help-board.html">Help Board</a><a href="my-posts.html">My Posts</a><a href="profile.html" class="active">Profile</a></aside><section class="card"><h2>Profile Settings</h2><p class="mini">Update your public information and keep your account details current.</p><div id="profileFeedback"></div><form id="profileForm"><div class="form-row"><div class="form-group"><label for="name">Full Name</label><input id="name" name="name" required></div><div class="form-group"><label for="email">Email</label><input id="email" name="email" type="email" readonly></div></div><div class="form-row"><div class="form-group"><label for="city">City</label><input id="city" name="city"></div><div class="form-group"><label for="state">State</label><input id="state" name="state"></div></div><div class="form-group"><label for="bio">Bio</label><textarea id="bio" name="bio"></textarea></div><div class="form-actions"><button class="btn" type="submit">Save Changes</button></div></form></section></section></main>
   <div id="app-footer"></div>
-  <script src="js/app.js" defer></script>
-  <script src="js/auth.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="auth.js" defer></script>
 </body>
 </html>
