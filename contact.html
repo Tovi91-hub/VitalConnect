@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | VitalConnect</title>
+  <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  
+</head>
+<body>
+  <div id="app-header"></div>
+  <main id="main-content"><section class="page-header"><div class="container center"><h1>Contact</h1><p class="lead" style="margin-inline:auto">Use this page as a professional contact and support form for the project site.</p></div></section><section class="container"><div class="card form-card"><div class="notice info">This form demonstrates front-end usability and validation. On static hosting, submissions do not send email, but the interface is fully functional for project review.</div><form onsubmit="event.preventDefault(); document.querySelector('#contactFeedback').innerHTML = VitalConnect.createNotice('Thank you. Your message has been captured for demonstration purposes.', 'success'); this.reset();"><div id="contactFeedback"></div><div class="form-row"><div class="form-group"><label for="name">Name</label><input id="name" required></div><div class="form-group"><label for="email">Email</label><input id="email" type="email" required></div></div><div class="form-group"><label for="subject">Subject</label><input id="subject" required></div><div class="form-group"><label for="message">Message</label><textarea id="message" required></textarea></div><div class="form-actions"><button class="btn" type="submit">Send Message</button></div></form></div></section></main>
+  <div id="app-footer"></div>
+  <script src="js/app.js" defer></script>
+  
+</body>
+</html>
