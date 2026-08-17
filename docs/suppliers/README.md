@@ -8,19 +8,23 @@ build work on the storefront.
 | [`supplier-strategy.md`](supplier-strategy.md) | Target suppliers, what each one actually offers, verified facts and open questions |
 | [`compliance-prerequisites.md`](compliance-prerequisites.md) | What must exist before a distributor will open an account, and the licensing exposure of the private-label step |
 | [`unit-economics.md`](unit-economics.md) | The SKU contribution-margin model and the order-volume math behind the revenue targets |
+| [`website-repositioning-brief.md`](website-repositioning-brief.md) | What myvitalharmony.com must show before the Medline URL is handed over |
 | [`outreach-templates.md`](outreach-templates.md) | Ready-to-send application and outreach messages per supplier |
 | [`../../tools/sku-margin.js`](../../tools/sku-margin.js) | Offline calculator implementing the margin model (Node, no dependencies) |
 
-## Status of this repository
+## Wrong repository — move this package
 
-This repository is **VitalConnect** — a static community-wellness site (mood tracking,
-prayer wall, help board, blessing marketplace) built for a Purdue Global IT499 capstone,
-using HTML/CSS/JS and LocalStorage. It contains no product catalog, cart, checkout,
-payment integration, or supplier code of any kind.
+This is **VitalConnect**, a separate Purdue Global IT499 capstone project. The MyVital
+Harmony code lives at **`MyVitalHarmony/myvitalharmony-platform`**.
 
-Nothing here is an e-commerce storefront yet, so the supply-chain work below is planning
-material, not integration work against an existing platform. See the note in
-`supplier-strategy.md` under "Positioning claim to verify."
+This package landed here because the session could not attach that repository:
+`add_repo` rejects cross-owner adds once a session already holds repos from another owner
+(`tovi91-hub`). Reaching the platform repo requires a **new session started with
+`MyVitalHarmony/myvitalharmony-platform` as its initial source.**
+
+Everything in this folder is portable — plain Markdown plus one dependency-free Node
+script. Move `docs/suppliers/` and `tools/sku-margin.js` into the platform repo, then
+delete this branch.
 
 ## Sequence
 
