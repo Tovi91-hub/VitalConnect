@@ -4,16 +4,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About | VitalConnect</title>
-  <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
-  <link rel="icon" href="logo.svg" type="svg+xml">
+  <meta name="description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta name="theme-color" content="#0f4c81">
+  <meta property="og:title" content="About | VitalConnect">
+  <meta property="og:description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  
+  <script>
+    /* Applies the saved theme before the first paint, so the page never
+       flashes the light palette on its way to dark. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('vc_theme');
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute(
+          'data-theme',
+          stored === 'dark' || stored === 'light' ? stored : (dark ? 'dark' : 'light')
+        );
+      } catch (error) { /* Storage blocked; the light default applies. */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app-header"></div>
-  <main id="main-content"><section class="page-header"><div class="container center"><h1>About VitalConnect</h1><p class="lead" style="margin-inline:auto">VitalConnect is a responsive community wellness website designed as an IT499 capstone project and built for static deployment.</p></div></section><section class="section"><div class="container grid grid-2"><article class="card"><h2>Project Purpose</h2><p class="mini">VitalConnect addresses the need for a user-friendly platform where members can connect through wellness tracking, prayer support, resource sharing, and community assistance. The solution demonstrates front-end architecture, responsive design, client-side validation, and persistent browser storage.</p></article><article class="card"><h2>Technical Approach</h2><p class="mini">The website uses HTML, CSS, JavaScript, JSON seed files, and LocalStorage to replace traditional database services on a restricted school hosting environment. This approach supports usability, maintainability, and straightforward deployment.</p></article></div></section><section class="section"><div class="container card"><h2>Core Success Factors</h2><div class="badge-row"><span class="tag">Responsive UI</span><span class="tag">Protected Pages</span><span class="tag">CRUD Features</span><span class="tag">Accessible Forms</span><span class="tag">Static Hosting</span></div></div></section></main>
+  <main id="main-content">
+    <noscript>
+      <div class="container" style="padding:24px 0">
+        <div class="notice warning">
+          VitalConnect stores your account and posts in your own browser, so it needs
+          JavaScript enabled. Please turn it on and reload this page.
+        </div>
+      </div>
+    </noscript>
+
+    <section class="page-header">
+      <div class="container center">
+        <h1>About VitalConnect</h1>
+        <p class="lead" style="margin-inline:auto">
+          A responsive community wellness site, designed as an IT499 capstone project
+          and built to deploy on restricted static hosting.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid grid-2">
+        <article class="card">
+          <h2>The problem</h2>
+          <p class="mini">
+            Small support communities — a congregation, a student cohort, a
+            neighbourhood group — coordinate care over group chats and notice boards,
+            where requests scroll away and nobody can tell what has been answered.
+            VitalConnect gives those needs a structured home: a request has a status, a
+            listing can be marked claimed, and a mood entry becomes a trend rather than
+            a passing comment.
+          </p>
+        </article>
+        <article class="card">
+          <h2>The constraint</h2>
+          <p class="mini">
+            The hosting available for this project serves static files only — no
+            database, no server-side language, no build step. Every feature here is
+            therefore implemented in HTML, CSS, and vanilla JavaScript, with the
+            browser's LocalStorage standing in for the persistence layer a production
+            deployment would get from a server.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container card">
+        <h2>How it is built</h2>
+        <div class="grid grid-2" style="margin-top:16px">
+          <div>
+            <h3>Architecture</h3>
+            <p class="mini">
+              <strong>core.js</strong> holds pure logic — hashing, validation,
+              formatting, statistics — with no browser APIs, so it can be unit tested
+              under Node. <strong>app.js</strong> adds storage, sessions, page chrome,
+              theming, and a small router. <strong>auth.js</strong>,
+              <strong>mood.js</strong>, and <strong>community.js</strong> each own one
+              area of the product and are loaded only by the pages that need them.
+            </p>
+          </div>
+          <div>
+            <h3>Data handling</h3>
+            <p class="mini">
+              Passwords are stored as salted, stretched SHA-256 digests rather than
+              plaintext. Collections are versioned, so an older browser's saved data is
+              migrated forward on load rather than being discarded. Corrupt or
+              oversized writes are caught and reported instead of silently failing.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container card">
+        <h2>What it demonstrates</h2>
+        <div class="badge-row">
+          <span class="tag">Responsive layout</span>
+          <span class="tag">Protected member pages</span>
+          <span class="tag">Full create, read, update, delete</span>
+          <span class="tag">Accessible forms</span>
+          <span class="tag">Client-side validation</span>
+          <span class="tag">Data visualisation</span>
+          <span class="tag">Light and dark themes</span>
+          <span class="tag">Unit-tested core</span>
+          <span class="tag">Static hosting</span>
+        </div>
+      </div>
+    </section>
+  </main>
   <div id="app-footer"></div>
+  <script src="core.js" defer></script>
   <script src="app.js" defer></script>
-  
 </body>
 </html>

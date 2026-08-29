@@ -4,16 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prayer Wall | VitalConnect</title>
-  <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
-  <link rel="icon" href="logo.svg" type="svg+xml">
+  <meta name="description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta name="theme-color" content="#0f4c81">
+  <meta property="og:title" content="Prayer Wall | VitalConnect">
+  <meta property="og:description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  
+  <script>
+    /* Applies the saved theme before the first paint, so the page never
+       flashes the light palette on its way to dark. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('vc_theme');
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute(
+          'data-theme',
+          stored === 'dark' || stored === 'light' ? stored : (dark ? 'dark' : 'light')
+        );
+      } catch (error) { /* Storage blocked; the light default applies. */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app-header"></div>
-  <main id="main-content"><section class="container dashboard-shell" id="featureShell"></section></main>
+  <main id="main-content">
+    <noscript>
+      <div class="container" style="padding:24px 0">
+        <div class="notice warning">
+          VitalConnect stores your account and posts in your own browser, so it needs
+          JavaScript enabled. Please turn it on and reload this page.
+        </div>
+      </div>
+    </noscript>
+
+    <section class="container dashboard-shell" id="featureShell"></section>
+  </main>
   <div id="app-footer"></div>
+  <script src="core.js" defer></script>
   <script src="app.js" defer></script>
-  <script src= "community.js"defer></script>
+  <script src="community.js" defer></script>
 </body>
 </html>

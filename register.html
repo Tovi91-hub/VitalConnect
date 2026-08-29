@@ -4,15 +4,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register | VitalConnect</title>
-  <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
-  <link rel="icon" href="logo.svg" type="svg+xml">
+  <meta name="description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta name="theme-color" content="#0f4c81">
+  <meta property="og:title" content="Register | VitalConnect">
+  <meta property="og:description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  
+  <script>
+    /* Applies the saved theme before the first paint, so the page never
+       flashes the light palette on its way to dark. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('vc_theme');
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute(
+          'data-theme',
+          stored === 'dark' || stored === 'light' ? stored : (dark ? 'dark' : 'light')
+        );
+      } catch (error) { /* Storage blocked; the light default applies. */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app-header"></div>
-  <main id="main-content"><section class="page-header"><div class="container center"><h1>Create Your Account</h1><p class="lead" style="margin-inline:auto">Register to access the full VitalConnect community experience.</p></div></section><section class="container"><div class="card form-card"><div id="formFeedback"></div><form id="registerForm"><div class="form-row"><div class="form-group"><label for="name">Full Name</label><input id="name" name="name" required></div><div class="form-group"><label for="email">Email</label><input id="email" name="email" type="email" required></div></div><div class="form-row"><div class="form-group"><label for="password">Password</label><input id="password" name="password" type="password" required></div><div class="form-group"><label for="confirmPassword">Confirm Password</label><input id="confirmPassword" name="confirmPassword" type="password" required></div></div><div class="form-row"><div class="form-group"><label for="city">City</label><input id="city" name="city" required></div><div class="form-group"><label for="state">State</label><input id="state" name="state" required></div></div><div class="form-group"><label for="bio">Short Bio</label><textarea id="bio" name="bio" placeholder="Share a short introduction."></textarea></div><div class="form-actions"><button class="btn" type="submit">Register</button><a class="btn-ghost" href="login.html">Already have an account?</a></div></form></div></section></main>
+  <main id="main-content">
+    <noscript>
+      <div class="container" style="padding:24px 0">
+        <div class="notice warning">
+          VitalConnect stores your account and posts in your own browser, so it needs
+          JavaScript enabled. Please turn it on and reload this page.
+        </div>
+      </div>
+    </noscript>
+
+    <section class="page-header">
+      <div class="container center">
+        <h1>Create your account</h1>
+        <p class="lead" style="margin-inline:auto">
+          Join VitalConnect to track your wellbeing and take part in the community.
+        </p>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="card form-card">
+        <div id="formFeedback"></div>
+        <form id="registerForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full name</label>
+              <input id="name" name="name" required autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required autocomplete="email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" required autocomplete="new-password">
+            <div id="passwordStrength"></div>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Confirm password</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" required autocomplete="new-password">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input id="city" name="city" required autocomplete="address-level2">
+            </div>
+            <div class="form-group">
+              <label for="state">State</label>
+              <input id="state" name="state" required autocomplete="address-level1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="bio">Short bio <span class="mini">(optional)</span></label>
+            <textarea id="bio" name="bio" maxlength="300" placeholder="Share a short introduction."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">Create account</button>
+            <a class="btn-ghost" href="login.html">Already have an account?</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
   <div id="app-footer"></div>
+  <script src="core.js" defer></script>
   <script src="app.js" defer></script>
   <script src="auth.js" defer></script>
 </body>
