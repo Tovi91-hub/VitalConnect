@@ -36,7 +36,7 @@ function bindDelete(selector, storeKey, session, rerender, copy) {
       });
       if (!confirmed) return;
 
-      VitalConnect.setCollection(storeKey, items.filter(item => String(item.id) !== id));
+      if (!VitalConnect.setCollection(storeKey, items.filter(item => String(item.id) !== id))) return;
       VitalConnect.toast('Post deleted.', 'success');
       rerender();
     });
@@ -266,7 +266,7 @@ function initPrayerWall() {
           ? { ...item, title, content, updatedAt: new Date().toISOString() }
           : item
       );
-      VitalConnect.setCollection(VitalConnect.STORE.prayers, updated);
+      if (!VitalConnect.setCollection(VitalConnect.STORE.prayers, updated)) return;
       VitalConnect.toast('Request updated.', 'success');
     } else {
       items.unshift({
@@ -357,25 +357,40 @@ function initMarketplace() {
   // Holds the resized data URL between selecting a file and submitting, and
   // carries the existing photo through an edit that does not replace it.
   let pendingImage = '';
+  // The in-flight resize, if any. Resizing a large photo takes long enough
+  // that a quick submit used to read pendingImage while it was still empty and
+  // save the listing with no image at all, with the late result landing on an
+  // already-reset form. The submit handler now waits on this instead.
+  let imageTask = null;
 
-  form.image.addEventListener('change', async () => {
+  form.image.addEventListener('change', () => {
     const file = form.image.files[0];
-    if (!file) { pendingImage = ''; preview.hidden = true; preview.innerHTML = ''; return; }
+    if (!file) {
+      pendingImage = '';
+      imageTask = null;
+      preview.hidden = true;
+      preview.innerHTML = '';
+      return;
+    }
 
     preview.hidden = false;
     preview.innerHTML = '<p class="mini">Processing photo…</p>';
-    pendingImage = await VitalConnect.readImageScaled(file);
 
-    if (!pendingImage) {
-      preview.innerHTML = '<p class="mini">That file could not be read as an image.</p>';
-      return;
-    }
-    preview.innerHTML = `<img src="${VitalConnect.escAttr(pendingImage)}" alt="Preview of the photo you selected">`;
+    const task = VitalConnect.readImageScaled(file).then(dataUrl => {
+      // A newer selection may have superseded this one while it ran.
+      if (imageTask !== task) return;
+      pendingImage = dataUrl;
+      preview.innerHTML = dataUrl
+        ? `<img src="${VitalConnect.escAttr(dataUrl)}" alt="Preview of the photo you selected">`
+        : '<p class="mini">That file could not be read as an image.</p>';
+    });
+    imageTask = task;
   });
 
   const resetForm = () => {
     state.editing = null;
     pendingImage = '';
+    imageTask = null;
     form.reset();
     preview.hidden = true;
     preview.innerHTML = '';
@@ -459,6 +474,7 @@ function initMarketplace() {
         form.location.value = item.location;
         form.description.value = item.description;
         pendingImage = item.image || '';
+        imageTask = null;
 
         if (pendingImage) {
           preview.hidden = false;
@@ -481,7 +497,7 @@ function initMarketplace() {
     });
   };
 
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
     VitalConnect.clearFieldErrors(form);
 
@@ -494,6 +510,17 @@ function initMarketplace() {
     if (!category) { VitalConnect.setFieldError(form.category, 'Choose a category.'); form.category.focus(); return; }
     if (!location) { VitalConnect.setFieldError(form.location, 'Say where this can be collected.'); form.location.focus(); return; }
     if (description.length < 10) { VitalConnect.setFieldError(form.description, 'Add a little more detail (at least 10 characters).'); form.description.focus(); return; }
+
+    // Wait for a photo that is still being resized, so it is not dropped.
+    if (imageTask) {
+      const submitButton = form.querySelector('button[type="submit"]');
+      const label = submitButton.textContent;
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processing photo…';
+      await imageTask;
+      submitButton.disabled = false;
+      submitButton.textContent = label;
+    }
 
     const items = VitalConnect.getCollection(VitalConnect.STORE.blessings);
 
@@ -718,7 +745,7 @@ function initHelpBoard() {
           ? { ...item, title, urgency, description, updatedAt: new Date().toISOString() }
           : item
       );
-      VitalConnect.setCollection(VitalConnect.STORE.helpRequests, updated);
+      if (!VitalConnect.setCollection(VitalConnect.STORE.helpRequests, updated)) return;
       VitalConnect.toast('Request updated.', 'success');
     } else {
       items.unshift({
@@ -851,7 +878,7 @@ function initMyPosts() {
         const id = button.dataset.id;
         const remaining = VitalConnect.getCollection(storeKey)
           .filter(item => !(String(item.id) === id && ownedBy(item, session)));
-        VitalConnect.setCollection(storeKey, remaining);
+        if (!VitalConnect.setCollection(storeKey, remaining)) return;
         VitalConnect.toast('Post deleted.', 'success');
         render();
       });

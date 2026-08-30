@@ -485,6 +485,21 @@ function initProfile() {
         VitalConnect.getCollection(key).filter(item => item.authorEmail !== user.email)
       ));
 
+    // Removing only what the member authored would leave their address behind
+    // in other people's posts, so prayer counts would keep counting someone who
+    // is gone and re-registering the same address would inherit those old
+    // interactions.
+    const scrubInteractions = (key, field) => VitalConnect.setCollection(
+      key,
+      VitalConnect.getCollection(key).map(item =>
+        Array.isArray(item[field]) && item[field].includes(user.email)
+          ? { ...item, [field]: item[field].filter(email => email !== user.email) }
+          : item
+      )
+    );
+    scrubInteractions(VitalConnect.STORE.prayers, 'prayedBy');
+    scrubInteractions(VitalConnect.STORE.helpRequests, 'offers');
+
     VitalConnect.setCollection(
       VitalConnect.STORE.users,
       VitalConnect.getCollection(VitalConnect.STORE.users).filter(item => item.email !== user.email)

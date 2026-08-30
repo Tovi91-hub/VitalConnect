@@ -520,6 +520,121 @@ for (const path of pages) {
     JSON.stringify(rendered));
 }
 
+/* --------------------------------------------- review-round regressions */
+
+// P1: a session written before expiresAt existed must not be treated as
+// immortal. requireAuth() would otherwise renew it for another eight hours.
+const legacy = await context.newPage();
+await legacy.goto(`${BASE}/index.html`);
+await legacy.evaluate(() => {
+  localStorage.setItem('vc_session', JSON.stringify({
+    email: 'demo@vitalconnect.com', name: 'Demo User', role: 'member',
+    loggedInAt: new Date(Date.now() - 30 * 86400000).toISOString()  // 30 days old
+  }));
+});
+await legacy.goto(`${BASE}/dashboard.html`);
+await legacy.waitForTimeout(600);
+check('a stale pre-upgrade session (no expiresAt) is rejected',
+  legacy.url().includes('login.html'), legacy.url());
+
+// The derived expiry must still honour a session that is genuinely recent.
+await legacy.goto(`${BASE}/index.html`);
+await legacy.evaluate(() => {
+  localStorage.setItem('vc_session', JSON.stringify({
+    email: 'demo@vitalconnect.com', name: 'Demo User', role: 'member',
+    loggedInAt: new Date().toISOString()
+  }));
+});
+await legacy.goto(`${BASE}/dashboard.html`);
+await legacy.waitForTimeout(600);
+check('a recent pre-upgrade session is still honoured',
+  legacy.url().includes('dashboard.html'), legacy.url());
+await legacy.close();
+
+// P1: if the user write fails mid-migration, the schema must NOT be stamped
+// as upgraded — doing so would leave plaintext passwords behind a login that
+// only accepts hashes, locking every account out.
+const quota = await context.newPage();
+await quota.goto(`${BASE}/index.html`);
+await quota.evaluate(() => {
+  localStorage.setItem('vc_users', JSON.stringify([
+    { id: 1, name: 'Legacy User', email: 'legacy@vitalconnect.com',
+      password: 'PlainText123!', role: 'member', city: 'Indianapolis', state: 'IN' }
+  ]));
+  localStorage.removeItem('vc_schema');
+  localStorage.removeItem('vc_session');
+});
+// Make only the user write fail, the way a near-full quota would.
+await quota.addInitScript(() => {
+  const real = Storage.prototype.setItem;
+  Storage.prototype.setItem = function (key, value) {
+    if (key === 'vc_users') throw new DOMException('quota', 'QuotaExceededError');
+    return real.call(this, key, value);
+  };
+});
+await quota.goto(`${BASE}/login.html`);
+await quota.waitForTimeout(600);
+const halted = await quota.evaluate(() => ({
+  schema: localStorage.getItem('vc_schema'),
+  password: JSON.parse(localStorage.getItem('vc_users'))[0].password
+}));
+check('a failed migration write leaves the schema version alone',
+  halted.schema === null && halted.password === 'PlainText123!', JSON.stringify(halted));
+await quota.close();
+
+// ...and the next load, without the failure, completes it. Migration has to be
+// safe to re-run.
+const recovered = await context.newPage();
+await recovered.goto(`${BASE}/login.html`);
+await recovered.waitForTimeout(600);
+const after = await recovered.evaluate(() => ({
+  schema: localStorage.getItem('vc_schema'),
+  password: JSON.parse(localStorage.getItem('vc_users'))[0].password
+}));
+check('migration completes on the next load',
+  after.schema === '2' && after.password.startsWith('sha256$'), JSON.stringify(after));
+
+// P2: deleting an account must also remove that address from other members'
+// prayedBy and offers, not just the posts it authored.
+await recovered.evaluate(() => localStorage.clear());
+await recovered.goto(`${BASE}/login.html`);
+await recovered.fill('#email', 'demo@vitalconnect.com');
+await recovered.fill('#password', 'Password123!');
+await recovered.click('#loginForm button[type="submit"]');
+await recovered.waitForURL(/dashboard\.html/, { timeout: 10000 });
+
+const seededInteraction = await recovered.evaluate(() =>
+  JSON.parse(localStorage.getItem('vc_prayers'))
+    .some(p => p.authorEmail !== 'demo@vitalconnect.com' &&
+               (p.prayedBy || []).includes('demo@vitalconnect.com')));
+check('seed data has the member praying on someone else\'s post', seededInteraction);
+
+await recovered.goto(`${BASE}/profile.html`);
+await recovered.waitForSelector('#deleteAccount');
+await recovered.locator('#deleteAccount').scrollIntoViewIfNeeded();
+await recovered.waitForTimeout(350);
+await recovered.locator('#deleteAccount').click();
+await recovered.waitForSelector('.modal');
+await recovered.click('[data-modal-confirm]');
+await recovered.waitForURL(/index\.html/, { timeout: 10000 });
+
+const residue = await recovered.evaluate(() => {
+  const email = 'demo@vitalconnect.com';
+  const prayers = JSON.parse(localStorage.getItem('vc_prayers') || '[]');
+  const help = JSON.parse(localStorage.getItem('vc_help_requests') || '[]');
+  return {
+    ownPostsLeft: prayers.filter(p => p.authorEmail === email).length,
+    prayedByLeft: prayers.filter(p => (p.prayedBy || []).includes(email)).length,
+    offersLeft: help.filter(h => (h.offers || []).includes(email)).length,
+    othersPostsKept: prayers.length
+  };
+});
+check('account deletion scrubs the address from other members\' posts',
+  residue.ownPostsLeft === 0 && residue.prayedByLeft === 0 && residue.offersLeft === 0,
+  JSON.stringify(residue));
+check('other members\' posts survive the deletion', residue.othersPostsKept > 0);
+await recovered.close();
+
 await browser.close();
 
 /* -------------------------------------------------------------- summary */

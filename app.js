@@ -258,17 +258,29 @@ const VitalConnect = (() => {
       const plaintext = typeof user.password === 'string' ? user.password : '';
       return { ...user, password: Core.hashPassword(plaintext, randomSalt()), joinedAt: user.joinedAt || new Date().toISOString() };
     });
-    setCollection(STORE.users, users);
+    // The version is stamped only once every write has landed. Hashing expands
+    // the user record, so on a near-full quota that write can fail while the
+    // much smaller schema write succeeds — which would mark the store upgraded
+    // with plaintext passwords still in it and lock out every account, since
+    // login now accepts only hashes. Re-running is safe: already-hashed
+    // records are skipped and the other writes are idempotent.
+    const writes = [
+      setCollection(STORE.users, users),
+      setCollection(STORE.prayers, getCollection(STORE.prayers).map(item => ({
+        ...item, prayedBy: Array.isArray(item.prayedBy) ? item.prayedBy : []
+      }))),
+      setCollection(STORE.blessings, getCollection(STORE.blessings).map(item => ({
+        ...item, status: item.status || 'available'
+      }))),
+      setCollection(STORE.helpRequests, getCollection(STORE.helpRequests).map(item => ({
+        ...item, status: item.status || 'open', offers: Array.isArray(item.offers) ? item.offers : []
+      })))
+    ];
 
-    setCollection(STORE.prayers, getCollection(STORE.prayers).map(item => ({
-      ...item, prayedBy: Array.isArray(item.prayedBy) ? item.prayedBy : []
-    })));
-    setCollection(STORE.blessings, getCollection(STORE.blessings).map(item => ({
-      ...item, status: item.status || 'available'
-    })));
-    setCollection(STORE.helpRequests, getCollection(STORE.helpRequests).map(item => ({
-      ...item, status: item.status || 'open', offers: Array.isArray(item.offers) ? item.offers : []
-    })));
+    if (!writes.every(Boolean)) {
+      console.warn('VitalConnect: migration incomplete; leaving schema at version', previous);
+      return;
+    }
 
     setItem(STORE.schema, SCHEMA_VERSION);
   }
@@ -296,7 +308,18 @@ const VitalConnect = (() => {
   function getSession() {
     const session = getItem(STORE.session);
     if (!session || !session.email) return null;
-    if (session.expiresAt && Date.now() > session.expiresAt) {
+
+    // A session saved before this version carries loggedInAt but no expiresAt.
+    // Treating a missing expiry as "never expires" let a pre-upgrade session on
+    // a shared device stay valid indefinitely, because requireAuth() would then
+    // hand it a fresh eight hours through touchSession(). Derive the deadline
+    // from loggedInAt instead; an unusable timestamp resolves to the epoch and
+    // is therefore already expired.
+    const expiresAt = Number.isFinite(session.expiresAt)
+      ? session.expiresAt
+      : Core.toTime(session.loggedInAt) + SESSION_HOURS * 3600000;
+
+    if (Date.now() > expiresAt) {
       removeItem(STORE.session);
       return null;
     }
