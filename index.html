@@ -4,16 +4,120 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home | VitalConnect</title>
-  <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
-  <link rel="icon" href="logo.svg" type="svg+xml">
+  <meta name="description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta name="theme-color" content="#0f4c81">
+  <meta property="og:title" content="Home | VitalConnect">
+  <meta property="og:description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  
+  <script>
+    /* Applies the saved theme before the first paint, so the page never
+       flashes the light palette on its way to dark. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('vc_theme');
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute(
+          'data-theme',
+          stored === 'dark' || stored === 'light' ? stored : (dark ? 'dark' : 'light')
+        );
+      } catch (error) { /* Storage blocked; the light default applies. */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app-header"></div>
-  <main id="main-content"><section class="hero"><div class="container hero-grid"><div><span class="eyebrow">Professional Community Care Platform</span><h1>Support, wellness, and connection in one secure community space.</h1><p class="lead">VitalConnect helps users track mood, post prayer requests, share blessings, and request practical support through a polished web experience built for static hosting and capstone demonstration.</p><div class="badge-row"><a class="btn" href="register.html">Create Account</a><a class="btn-ghost" href="login.html">Member Login</a><a class="btn-secondary" href="about.html">Explore Features</a></div></div><div class="hero-card"><h2>Why VitalConnect works</h2><ul class="feature-list"><li><strong>Scalable static architecture.</strong> Deploy directly to a school hosting environment with HTML, CSS, JavaScript, JSON, and LocalStorage.</li><li><strong>Protected member spaces.</strong> Login, registration, session persistence, and logout behavior are included.</li><li><strong>Community-first features.</strong> Mood history, prayer wall, help board, marketplace, and user profile management are ready to use.</li></ul></div></div></section><section class="section"><div class="container grid grid-3"><div class="kpi"><strong>10+</strong><span>Fully linked pages</span></div><div class="kpi"><strong>100%</strong><span>Static hosting compatible</span></div><div class="kpi"><strong>Responsive</strong><span>Desktop and mobile ready</span></div></div></section><section class="section"><div class="container grid grid-3"><article class="card"><h3>Mood Tracking</h3><p class="mini">Capture wellness updates and visualize recent mood patterns.</p></article><article class="card"><h3>Prayer Wall</h3><p class="mini">Post needs, strengthen community, and build spiritual support.</p></article><article class="card"><h3>Marketplace & Help Board</h3><p class="mini">Share resources, request help, and manage your own posts.</p></article></div></section></main>
+  <main id="main-content">
+    <noscript>
+      <div class="container" style="padding:24px 0">
+        <div class="notice warning">
+          VitalConnect stores your account and posts in your own browser, so it needs
+          JavaScript enabled. Please turn it on and reload this page.
+        </div>
+      </div>
+    </noscript>
+
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">Community wellness platform</span>
+          <h1>Support, wellness, and connection in one secure community space.</h1>
+          <p class="lead">
+            VitalConnect helps members track how they are doing, ask for prayer, share
+            what they can spare, and request practical help — in a calm, private space
+            that runs entirely in the browser.
+          </p>
+          <div class="badge-row">
+            <a class="btn" href="register.html">Create your account</a>
+            <a class="btn-ghost" href="login.html">Member login</a>
+            <a class="btn-ghost" href="about.html">How it works</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <h2>Built for real use</h2>
+          <ul class="feature-list">
+            <li><strong>Private by design.</strong> Your account, mood entries, and posts stay in your own browser. Nothing is sent to a server.</li>
+            <li><strong>Works anywhere.</strong> Plain HTML, CSS, and JavaScript, so it deploys to any static hosting space without a database.</li>
+            <li><strong>Genuinely usable.</strong> Full keyboard support, a dark theme, and a layout that works on a phone as well as a laptop.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid grid-3">
+        <div class="kpi"><strong>14</strong><span>Linked, working pages</span></div>
+        <div class="kpi"><strong>100%</strong><span>Static hosting compatible</span></div>
+        <div class="kpi"><strong>0</strong><span>External dependencies</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="center">What members can do</h2>
+        <div class="grid grid-3" style="margin-top:24px">
+          <article class="card">
+            <h3>Track how you are doing</h3>
+            <p class="mini">
+              Log a mood in about fifteen seconds, add a note if you want to, and watch
+              the trend build over days and weeks. Export it as a CSV whenever you like.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Ask for prayer</h3>
+            <p class="mini">
+              Post a request to the wall and see who is praying with you. Members can
+              mark that they are praying, so support is visible rather than assumed.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Give and receive help</h3>
+            <p class="mini">
+              Offer items or services in the marketplace, or post a practical need on
+              the help board and let neighbours volunteer.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container card center">
+        <h2>Ready to join?</h2>
+        <p class="lead" style="margin-inline:auto">
+          Creating an account takes a minute, and you can explore everything with the
+          demo login first.
+        </p>
+        <div class="badge-row" style="justify-content:center">
+          <a class="btn" href="register.html">Create account</a>
+          <a class="btn-ghost" href="login.html">Use the demo account</a>
+        </div>
+      </div>
+    </section>
+  </main>
   <div id="app-footer"></div>
+  <script src="core.js" defer></script>
   <script src="app.js" defer></script>
-  
 </body>
 </html>

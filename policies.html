@@ -4,16 +4,104 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Policies | VitalConnect</title>
-  <meta name="description" content="VitalConnect community wellness platform for Purdue Global IT499 capstone deployment.">
-  <link rel="icon" href="logo.svg" type="svg+xml">
+  <meta name="description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta name="theme-color" content="#0f4c81">
+  <meta property="og:title" content="Policies | VitalConnect">
+  <meta property="og:description" content="VitalConnect is a community wellness platform for mood tracking, prayer support, shared resources, and practical help, built as a Purdue Global IT499 capstone.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  
+  <script>
+    /* Applies the saved theme before the first paint, so the page never
+       flashes the light palette on its way to dark. */
+    (function () {
+      try {
+        var stored = localStorage.getItem('vc_theme');
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute(
+          'data-theme',
+          stored === 'dark' || stored === 'light' ? stored : (dark ? 'dark' : 'light')
+        );
+      } catch (error) { /* Storage blocked; the light default applies. */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="app-header"></div>
-  <main id="main-content"><section class="page-header"><div class="container center"><h1>Policies and Use Guidelines </h1><p class="lead" style="margin-inline:auto">VitalConnect promotes safe, respectful, and constructive engagement.</p></div></section><section class="container grid grid-2"><article class="card"><h2>Community Standards</h2><p class="mini">Users should communicate respectfully, avoid abusive language, and share only content appropriate for a supportive community environment. Harmful or misleading posts should not be submitted.</p></article><article class="card"><h2>Privacy Notice</h2><p class="mini">VitalConnect stores demonstration data in the browser using LocalStorage. This project is intended for academic review and does not provide production-grade privacy controls or server-side protection.</p></article></section></main>
+  <main id="main-content">
+    <noscript>
+      <div class="container" style="padding:24px 0">
+        <div class="notice warning">
+          VitalConnect stores your account and posts in your own browser, so it needs
+          JavaScript enabled. Please turn it on and reload this page.
+        </div>
+      </div>
+    </noscript>
+
+    <section class="page-header">
+      <div class="container center">
+        <h1>Policies and use guidelines</h1>
+        <p class="lead" style="margin-inline:auto">
+          VitalConnect exists to support safe, respectful, and constructive engagement.
+        </p>
+      </div>
+    </section>
+
+    <section class="container grid grid-2">
+      <article class="card">
+        <h2>Community standards</h2>
+        <p class="mini">
+          Communicate respectfully and share only what is appropriate for a supportive
+          community. Do not post abusive language, harassment, misleading claims, or
+          another person's private information. Prayer requests and help requests often
+          carry sensitive detail — treat what you read here as told in confidence.
+        </p>
+      </article>
+      <article class="card">
+        <h2>Privacy notice</h2>
+        <p class="mini">
+          This project stores all data in your own browser using LocalStorage. Nothing
+          is transmitted to a server, and no analytics or third-party scripts are
+          loaded. Anyone with access to your device and browser profile can read that
+          data, so treat a shared or public computer accordingly and sign out when you
+          are finished.
+        </p>
+      </article>
+      <article class="card">
+        <h2>Your data and your control</h2>
+        <p class="mini">
+          Your profile page can export everything associated with your account as a JSON
+          file, and can delete your account together with every entry you have posted.
+          Clearing your browser's site data removes it just as completely. Because there
+          is no server copy, deleted data cannot be recovered.
+        </p>
+      </article>
+      <article class="card">
+        <h2>Academic scope</h2>
+        <p class="mini">
+          VitalConnect is coursework built for academic review. Passwords are salted and
+          stretched rather than stored in plaintext, but a browser-only application has
+          no server-side secret and cannot offer production-grade account security. Do
+          not reuse a password here that protects anything important.
+        </p>
+      </article>
+    </section>
+
+    <section class="container section">
+      <div class="card">
+        <h2>Safety</h2>
+        <p class="mini">
+          VitalConnect is not a medical service, a counselling service, or an emergency
+          service, and no one is monitoring posts for crises. If you or someone else is
+          in immediate danger, contact your local emergency number. In the United States
+          you can call or text <strong>988</strong> to reach the Suicide &amp; Crisis
+          Lifeline, twenty-four hours a day.
+        </p>
+      </div>
+    </section>
+  </main>
   <div id="app-footer"></div>
+  <script src="core.js" defer></script>
   <script src="app.js" defer></script>
-  
 </body>
 </html>
