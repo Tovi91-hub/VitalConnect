@@ -261,11 +261,11 @@ p:last-child { margin-bottom: 0; }
 
 .brand { display: flex; align-items: center; color: var(--ink); flex-shrink: 0; }
 .brand:hover { text-decoration: none; }
-.brand .logo { width: 168px; height: auto; }
+.brand .logo { width: 150px; height: auto; }
 
 .nav-links { display: flex; gap: var(--space-1); align-items: center; }
 .nav-links a {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2);
   border-radius: var(--radius-sm);
   color: var(--ink-soft);
   font-weight: 600;
@@ -992,20 +992,32 @@ legend { font-weight: 600; margin-bottom: var(--space-2); padding: 0; font-size:
   .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 940px) {
+/* The seven primary links plus the brand and auth controls need about
+   1086px, which the 92%-wide container only reaches at a ~1180px viewport.
+   Below that the drawer takes over. Collapsing at 940px instead — where the
+   rest of the layout reflows — left every width in between scrolling
+   sideways by up to 200px, so the nav gets its own breakpoint. */
+@media (max-width: 1180px) {
   .nav-links,
   .nav-auth { display: none; }
   .nav-toggle { display: inline-grid; }
   .mobile-nav { display: block; }
   .mobile-nav[hidden] { display: none; }
+}
 
+@media (max-width: 940px) {
   .hero-grid,
-  .footer-grid,
   .grid-3,
   .grid-2 { grid-template-columns: 1fr; }
 
+  /* The brand blurb spans the full width, then the two link lists sit beside
+     each other. Collapsing the footer to a single column instead makes it
+     taller than the viewport on a phone, so the crisis line at the bottom
+     ends up several thumb-scrolls below the last link. */
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: var(--space-5) var(--space-4); }
+  .footer-grid > :first-child { grid-column: 1 / -1; }
+
   .hero { padding: var(--space-6) 0 var(--space-4); }
-  .brand .logo { width: 150px; }
 
   /* The sidebar becomes a scrollable strip of links above the content, so
      member navigation stays reachable without a tall stack. */
